@@ -1,0 +1,65 @@
+/* Read multiple DS18B20 1-wire digital temperature sensors by address. More info: https://www.makerguides.com*/
+// Include the required Arduino libraries:
+#include <Arduino.h>
+#include "WIFI_NINA_Connector.h"
+#include "MQTTConnector.h"
+#include <OneWire.h>
+#include <DallasTemperature.h>
+// Set which pin of the Arduino the 1-Wire bus is connected to:
+#define ONE_WIRE_BUS 0
+// Create a new instance of the oneWire class to communicate with any OneWire device:
+OneWire oneWire ( ONE_WIRE_BUS ) ;
+// Pass the oneWire reference to the DallasTemperature library:
+DallasTemperature sensors ( &oneWire ) ;
+// Addresses of DS18B20 sensors connected to the 1-Wire bus
+byte sensor1 [ 8 ] = { 0x28, 0x52, 0x44, 0xE2, 0x08, 0x00, 0x00, 0xC3 } ;
+byte sensor2 [ 8 ] = { 0x28, 0x55, 0x0D, 0xE4, 0x08, 0x00, 0x00, 0x55 } ;
+
+void  setup ()  {
+// Start serial communication at a baud rate of 9600:
+Serial. begin ( 9600 ) ;
+wifiConnect();                  //Branchement au réseau WIFI
+  MQTTConnect();                  //Branchement au broker MQTT
+
+// Start the library:
+sensors. begin () ;
+}
+
+void  printTemperature ( DeviceAddress address )  {
+
+// Get the temperature in degrees Celsius for the device address:
+float tempC = sensors. getTempC (address) ;
+// Get the temperature in degrees Fahrenheit for the device address:
+float tempF = sensors. getTempF ( address ) ;
+Serial.print( tempC ) ;
+Serial. print ( "\xC2\xB0" ) ; // show the degree symbol
+Serial. print ( "C |" ) ;
+// Print the temperature in Fahrenheit
+Serial.print( tempF ) ;
+Serial. print ( "\xC2\xB0") ; // show the degree symbol
+Serial. println ( "F") ;
+
+appendPayload("LedRouge", tempC);  //Ajout de la valeur de la broche A3 au message MQTT
+  //appendPayload("LedVerte", );  //Ajout de la valeur de la broche A5 au message MQTT
+
+  sendPayload(); 
+}
+
+ void loop ()  {
+// Send the command to all devices on the bus to perform a temperature conversion:
+sensors. requestTemperatures () ;
+
+///Serial.print ( "Sensor 1:" ) ;
+Serial.print( "0x28, 0x52, 0x44, 0xE2, 0x08, 0x00, 0x00, 0xC3 :" ) ;
+printTemperature ( sensor1 ) ; // call the printTemperature function with the address of sensor1 as input
+Serial.println () ; // print an empty line
+
+///Serial.print ( "Sensor 2:" ) ;
+Serial.print ( "0x28, 0x55, 0x0D, 0xE4, 0x08, 0x00, 0x00, 0x55 :") ;
+printTemperature ( sensor2 ) ;
+Serial.println () ; // print an empty line
+Serial.println () ;
+
+
+delay ( 1000 ) ;
+}

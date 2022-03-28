@@ -1,0 +1,13 @@
+Codes pour trouver l'adresse d'un DS18 a la fois:
+https://www.hacktronics.com/Tutorials/arduino-1-wire-address-finder.html  Montrer par Andre
+Utiliser par  moi code + explication de l'auteurr:
+https://www.volta.ma/le-guide-complet-des-capteurs-de-temperature-numeriques-ds18b20-avec-arduino/arduino/
+
+Schema circuit:
+https://forum.arduino.cc/t/multiple-ds18b20-sensors-on-one-digital-pin/697903
+
+Adresse BS18(1):
+0x28, 0x52, 0x44, 0xE2, 0x08, 0x00, 0x00, 0xC3
+
+Adresse BS18(2):
+0x28, 0x55, 0x0D, 0xE4, 0x08, 0x00, 0x00, 0x55
